@@ -46,7 +46,7 @@ Why do I so hope that you'll use c# to writing code?
 Because the performance of c# is better than gdscript usually and mixed use c# and gdscript is worse than anything.
 
 ### Configuration file:
-The most common configuration file type is XML, such as ([ProjectConfig.xml](res://config/ProjectConfig.xml))
+The most common configuration file type is XML, such as ([ProjectConfig.xml](res://Config/ProjectConfig.xml))
 On the premise of all this, you should know the basic grammar of XML (If you are confused, you can learn it from the official documentation).
 But there is not any configuration file is XML, such as ([Note.json](Resource/Example/Note.json))
 If you don't know how to use even JSON, I can't say anything to you.

@@ -10,6 +10,7 @@
     <Content Include="Config\ProjectConfig.xml" />
     <Content Include="Document\DevelopRecord.md" />
     <Content Include="GameSetting.cfg" />
+    <Content Include="Properties\launchSettings.json" />
     <Content Include="README.md" />
     <Content Include="Resource\Example\Note.json" />
     <Content Include="Tool\IL\what.il" />
