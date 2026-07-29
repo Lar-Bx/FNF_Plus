@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://b55cqy1ue1qsp"]
+
+[ext_resource type="Script" uid="uid://cpjgak15b0qau" path="res://Base/Note/NoteManager.cs" id="1_6mhco"]
+
+[node name="NoteManager" type="Control" unique_id=10621506]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_6mhco")
+metadata/_custom_type_script = "uid://cpjgak15b0qau"
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=2028558946]

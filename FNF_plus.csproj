@@ -1,0 +1,23 @@
+<Project Sdk="Godot.NET.Sdk/4.7.1-rc.1">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'android' ">net9.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="Assets\Shared\Images\Notes.png" />
+    <Content Include="Assets\Shared\Images\notes.xml" />
+    <Content Include="Config\ProjectConfig.xml" />
+    <Content Include="Document\DevelopRecord.md" />
+    <Content Include="GameSetting.cfg" />
+    <Content Include="README.md" />
+    <Content Include="Resource\Example\Note.json" />
+    <Content Include="Tool\IL\what.il" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Tool\ConfigTool\ConfigHandler\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="Tool\ConfigTool\ConfigHandler\**" />
+  </ItemGroup>
+</Project>

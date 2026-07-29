@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://r7187wwj4igp"]
+
+[ext_resource type="Script" uid="uid://bry1jrcykedfs" path="res://Base/OverPanel/Background.cs" id="1_1y2jd"]
+
+[node name="Background" type="Node" unique_id=1997844358]
+script = ExtResource("1_1y2jd")
+metadata/_custom_type_script = "uid://bry1jrcykedfs"

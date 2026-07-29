@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project_config>
+	
+	<run_config>
+		<main_scene>res://Scene/note_manager.tscn</main_scene>
+	</run_config>
+	
+</project_config>
