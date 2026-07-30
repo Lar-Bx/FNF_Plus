@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Xml.Linq;
+using FNF_plus.Resource.Note;
 using FNF_plus.Tool.ConfigTool;
 
 namespace FNF_plus.Base.OverPanel;
@@ -31,6 +32,7 @@ public partial class Background : Node
         // Init
         ConfigHandler.Init();
         GameSetting.KeyBinding.Initialize();
+        NotePresetRegister.Initialize();
         
         var scPath = ProjectConfig.Root?.Element("run_config")?.Element("main_scene")?.Value;
         var pck = GD.Load<PackedScene>(scPath);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FNF_plus.Resource.Note;
 using FNF_plus.Resource.ResourceLoader;
 using FNF_plus.Tool.ConfigTool;
 using Microsoft.VisualBasic.CompilerServices;
@@ -12,14 +13,39 @@ using Godot;
 [GlobalClass]
 public sealed partial class NoteManager : Control
 {
-    public readonly List<NoteGroup> NoteGroups = [];
+    public NoteGroup[] NoteGroups = [];
 
     public long Progress;
     public bool DoRunning = false;
 
     public float ScrollScale = 1f;
     public float BPM = 120f;
-    public long DecisionInterval = 180L;
+
+    
+    /*
+     * I don't want to set it into readonly,
+     * because I want to change it in the future.
+     */
+    
+    public enum DecisionType
+    {
+        Prefect,
+        Good,
+        Bad,
+        TooEarly,
+        Miss
+    }
+    
+    public long DecisionInterval = 200L; // ms
+
+    public Dictionary<DecisionType, long> KeyToDecisionInterval = new()
+    {
+        {DecisionType.Prefect, 50L},
+        {DecisionType.Good, 100L},
+        {DecisionType.Bad, 150L}
+    };
+    
+    
     public long DestroyDistance = 300L;
     
     public const float DefaultScrollPixelSize = 0.5f;
@@ -29,14 +55,15 @@ public sealed partial class NoteManager : Control
     public delegate void OnNoteJustPressedEventHandler(NoteGroup group);
     [Signal]
     public delegate void OnNoteJustReleasedEventHandler(NoteGroup group);
-    [Signal]
-    public delegate void OnNoteHitEventHandler(NoteGroup group, int index);
+    [Signal] // grade: DecisionType
+    public delegate void OnNoteHitEventHandler(NoteGroup group, int index, int grade);
     
     
     public void ParseJson(Json json)
     {
         var data = (Godot.Collections.Dictionary<string, Array>)json.Data;
-
+        var tempList = new List<NoteGroup>();
+        
         foreach (var pair in data)
         {
             var sq = new NoteGroup(pair.Key)
@@ -50,10 +77,12 @@ public sealed partial class NoteManager : Control
             for (int i = 0; i < pair.Value.Count; i++)
             {
                 sq.Instantiations[i].DistanceOfHit = (long)((Array)pair.Value[i])[0];
+                sq.Instantiations[i].Preset = (ushort)((Array)pair.Value[i])[1];
             }
-            NoteGroups.Add(sq);
-
+            tempList.Add(sq);
         }
+        
+        NoteGroups = tempList.ToArray();
         
     }
 
@@ -67,8 +96,8 @@ public sealed partial class NoteManager : Control
         
         ParseJson(ks);
 
-        NoteGroups[0].BaseTexture = StaticResourceLoader.GetResource("note.base") as Texture2D;
-        NoteGroups[0].NoteTextures[0] = StaticResourceLoader.GetResource("note.base") as Texture2D;
+        NoteGroups[0].BaseTexture = StaticResourceLoader.GetLoadedResource("noteLeft0001") as Texture2D;
+        //NoteGroups[0].NoteTextures[0] = StaticResourceLoader.GetLoadedResource("note.base") as Texture2D;
         NoteGroups[0].AutoPlay = false;
         NoteGroups[0].BindKey = GameSetting.KeyBinding.Key.Left;
         DoRunning = true;
@@ -116,7 +145,7 @@ public sealed partial class NoteManager : Control
                     }
                     
                     DrawSetTransformMatrix(xform.Translated(dir * (trueDistance))); 
-                    DrawTexture(group.NoteTextures[0], Vector2.Zero);
+                    DrawTexture(NotePresetRegister.GetPreset(group.Instantiations[i].Preset).Texture, Vector2.Zero);
                     
                 }
 
@@ -143,7 +172,7 @@ public sealed partial class NoteManager : Control
             // Region Key
             var keyName = eventKey.Keycode.ToString().ToLower();
             
-            for (int i = 0; i < NoteGroups.Count; i++)
+            for (int i = 0; i < NoteGroups.Length; i++)
             { 
                 if (IsGroupCompleted(NoteGroups[i])) continue;
                 
@@ -186,8 +215,9 @@ public sealed partial class NoteManager : Control
         {
             var trueDistance = group.Instantiations[i].DistanceOfHit - Progress;
             if (group.Instantiations[i].IsHit || Math.Abs(trueDistance) > DecisionInterval) continue;
-            
-            EmitSignal(SignalName.OnNoteHit, group, i);
+            var grade = (int)GetDecisionType(trueDistance);
+            EmitSignal(SignalName.OnNoteHit, group, i, grade);
+            NotePresetRegister.GetPreset(group.Instantiations[i].Preset).OnHit(grade);
             group.PassedIndex++;
             break;
         }
@@ -201,4 +231,16 @@ public sealed partial class NoteManager : Control
     public bool IsGroupCompleted(NoteGroup group) => group.Instantiations[^1].IsHit ||
                                                      group.Instantiations[^1].DistanceOfHit - Progress < -DestroyDistance;
 
+    
+    public DecisionType GetDecisionType(long distance)
+    {
+        var abs = Math.Abs(distance);
+        if (abs <= KeyToDecisionInterval[DecisionType.Prefect]) return DecisionType.Prefect;
+        if (abs <= KeyToDecisionInterval[DecisionType.Good]) return DecisionType.Good;
+        if (abs <= KeyToDecisionInterval[DecisionType.Bad]) return DecisionType.Bad;
+        
+        if (distance > 0 && distance < DecisionInterval) return DecisionType.TooEarly;
+        return DecisionType.Miss;
+    }
+    
 }
